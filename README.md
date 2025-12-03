@@ -1,0 +1,1 @@
+Para subir o banco rodar: docker compose up -d
