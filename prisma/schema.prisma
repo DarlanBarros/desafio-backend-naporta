@@ -13,11 +13,64 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
 model User {
   id       String @id @default(uuid())
   name     String
   email    String @unique
   password String
+  role     Role   @default(MEMBER)
 
   @@map("users")
+}
+
+model Customer {
+  id       String @id @default(uuid())
+  name     String
+  document String
+
+  orders Order[]
+
+  @@map("clientes")
+}
+
+model Order {
+  id                    String      @id @default(uuid())
+  orderNumber           String      @unique @map("numero")
+  deliveryAddress       String      @map("endereco_entrega")
+  estimatedDeliveryDate DateTime    @map("data_previsao_entrega")
+  status                OrderStatus @default(PENDING)
+  createdAt             DateTime    @default(now()) @map("data_criacao")
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("cliente_id")
+
+  items OrderItem[]
+
+  @@map("pedidos")
+}
+
+model OrderItem {
+  id          String  @id @default(uuid())
+  description String  @map("descricao")
+  price       Decimal @map("preco") @db.Decimal(10, 2)
+  quantity    Int     @map("quantidade")
+
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String @map("pedido_id")
+
+  @@map("itens_pedido")
 }
