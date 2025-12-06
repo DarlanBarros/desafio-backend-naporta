@@ -1,7 +1,7 @@
-import type { Customer } from "@prisma/client";
+import type { Customer, Prisma } from "@prisma/client";
 
 export interface CustomersRepository {
-  findOne(id: string): Promise<Customer | null>;
-  getName(customerId: string): Promise<string>;
-  getDocument(customerId: string): Promise<string>;
+  create(data: Prisma.CustomerUncheckedCreateInput): Promise<Customer>;
+  findById(id: string): Promise<Customer | null>;
+  findByDocument(document: string): Promise<Customer | null>;
 }

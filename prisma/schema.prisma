@@ -34,6 +34,8 @@ model User {
   password String
   role     Role   @default(MEMBER)
 
+  customer Customer?
+
   @@map("users")
 }
 
@@ -41,6 +43,9 @@ model Customer {
   id       String @id @default(uuid())
   name     String
   document String
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
 
   orders Order[]
 

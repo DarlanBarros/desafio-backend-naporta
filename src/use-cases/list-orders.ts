@@ -1,26 +1,19 @@
 import type { OrderStatus } from "@prisma/client";
 import type { CustomersRepository } from "@/repositories/customers-repository.js";
-import type { OrdersItensRepository } from "@/repositories/orders-itens-repository.js";
+import type { OrdersItemsRepository } from "@/repositories/orders-items-repository.js";
 import type { OrdersRepository } from "@/repositories/orders-repository.js";
-
-interface CustomerResponse {
-  name: string;
-  document: string;
-}
 
 interface OrderItemResponse {
   description: string;
   price: number;
 }
 
-export interface ListOrdersRequest {
-  orderNumber?: string;
-  status?: OrderStatus;
-  startDate?: Date;
-  endDate?: Date;
+interface CustomerResponse {
+  name: string;
+  document: string;
 }
 
-export interface OrdersData {
+interface OrdersData {
   id: string;
   orderNumber: string;
   deliveryAddress: string;
@@ -31,6 +24,13 @@ export interface OrdersData {
   items: OrderItemResponse[];
 }
 
+interface ListOrdersRequest {
+  orderNumber?: string;
+  status?: OrderStatus;
+  startDate?: Date;
+  endDate?: Date;
+}
+
 interface ListOrdersResponse {
   ordersData: OrdersData[];
 }
@@ -39,7 +39,7 @@ export class ListOrdersUseCase {
   constructor(
     private ordersRepository: OrdersRepository,
     private customersRepository: CustomersRepository,
-    private orderItemsRepository: OrdersItensRepository
+    private orderItemsRepository: OrdersItemsRepository
   ) {}
 
   async execute(filters: ListOrdersRequest): Promise<ListOrdersResponse> {
@@ -47,14 +47,15 @@ export class ListOrdersUseCase {
     const orders = await this.ordersRepository.findManyByFilter(filters);
 
     for (const order of orders) {
+      const customer = await this.customersRepository.findById(
+        order.customerId
+      );
       ordersData.push({
         id: order.id,
         orderNumber: order.orderNumber,
         customer: {
-          name: await this.customersRepository.getName(order.customerId),
-          document: await this.customersRepository.getDocument(
-            order.customerId
-          ),
+          name: customer?.name ?? "",
+          document: customer?.document ?? "",
         },
         status: order.status,
         deliveryAddress: order.deliveryAddress,

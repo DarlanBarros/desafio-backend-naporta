@@ -1,7 +1,7 @@
 import type { Order } from "@prisma/client";
 import { Decimal } from "decimal.js";
 import type { CustomersRepository } from "@/repositories/customers-repository.js";
-import type { OrdersItensRepository } from "@/repositories/orders-itens-repository.js";
+import type { OrdersItemsRepository } from "@/repositories/orders-items-repository.js";
 import type { OrdersRepository } from "@/repositories/orders-repository.js";
 import { CustomerNotExistsError } from "./errors/customer-not-exists-error.js";
 import { EmptyOrderItemsError } from "./errors/empty-order-items-error.js";
@@ -16,7 +16,7 @@ interface CreateOrderRequest {
   customerId: string;
   estimatedDeliveryDate: Date;
   deliveryAddress: string;
-  orderItens: OrderItems[];
+  orderItems: OrderItems[];
 }
 
 interface CreateOrderResponse {
@@ -27,22 +27,22 @@ export class CreateOrderUseCase {
   constructor(
     private customersRepository: CustomersRepository,
     private ordersRepository: OrdersRepository,
-    private ordersItensRepository: OrdersItensRepository
+    private ordersItemsRepository: OrdersItemsRepository
   ) {}
 
   async execute({
     customerId,
     deliveryAddress,
     estimatedDeliveryDate,
-    orderItens,
+    orderItems,
   }: CreateOrderRequest): Promise<CreateOrderResponse> {
-    const customer = await this.customersRepository.findOne(customerId);
+    const customer = await this.customersRepository.findById(customerId);
 
     if (!customer) {
       throw new CustomerNotExistsError();
     }
 
-    if (orderItens.length < 1) {
+    if (orderItems.length < 1) {
       throw new EmptyOrderItemsError();
     }
 
@@ -55,8 +55,8 @@ export class CreateOrderUseCase {
       estimatedDeliveryDate,
     });
 
-    orderItens.map(async (item) => {
-      await this.ordersItensRepository.create({
+    orderItems.map(async (item) => {
+      await this.ordersItemsRepository.create({
         description: item.description,
         price: new Decimal(item.price),
         quantity: item.quantity,

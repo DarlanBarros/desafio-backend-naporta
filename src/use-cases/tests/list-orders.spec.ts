@@ -1,27 +1,47 @@
 /** biome-ignore-all lint/suspicious/useAwait: <explanation> */
+
+import type { Customer, User } from "@prisma/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryCustomersRepository } from "@/repositories/in-memory/in-memory-customers-repository.js";
-import { InMemoryOrdersItensRepository } from "@/repositories/in-memory/in-memory-orders-itens-repository.js";
+import { InMemoryOrdersItemsRepository } from "@/repositories/in-memory/in-memory-orders-items-repository.js";
 import { InMemoryOrdersRepository } from "@/repositories/in-memory/in-memory-orders-repository.js";
-import { ListOrdersUseCase } from "./list-orders.js";
+import { InMemoryUsersRepository } from "@/repositories/in-memory/in-memory-users-repository.js";
+import { ListOrdersUseCase } from "../list-orders.js";
 
 let ordersRepository: InMemoryOrdersRepository;
-let ordersItensRepository: InMemoryOrdersItensRepository;
+let ordersItemsRepository: InMemoryOrdersItemsRepository;
 let customersRepository: InMemoryCustomersRepository;
+let usersRepository: InMemoryUsersRepository;
 let sut: ListOrdersUseCase;
 
+let user: User;
+let customer: Customer;
+
 describe("List Orders", () => {
-  beforeEach(() => {
-    ordersItensRepository = new InMemoryOrdersItensRepository();
+  beforeEach(async () => {
+    ordersItemsRepository = new InMemoryOrdersItemsRepository();
     customersRepository = new InMemoryCustomersRepository();
     ordersRepository = new InMemoryOrdersRepository();
+    usersRepository = new InMemoryUsersRepository();
     sut = new ListOrdersUseCase(
       ordersRepository,
       customersRepository,
-      ordersItensRepository
+      ordersItemsRepository
     );
 
     vi.useFakeTimers();
+
+    user = await usersRepository.create({
+      name: "Jhon Doe",
+      email: "johndoe@example.com",
+      password: "12345678",
+    });
+
+    customer = await customersRepository.create({
+      userId: user.id,
+      name: "Jhon Doe",
+      document: "157.462.852-45",
+    });
   });
 
   afterEach(() => {
@@ -29,27 +49,21 @@ describe("List Orders", () => {
   });
 
   it("should be able to list orders", async () => {
-    customersRepository.items.push({
-      id: "customer-01",
-      name: "John Doe",
-      document: "01524875149",
-    });
-
     ordersRepository.create({
-      customerId: "customer-01",
+      customerId: customer.id,
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-08"),
       orderNumber: "P-XYZ",
     });
 
-    ordersItensRepository.create({
+    ordersItemsRepository.create({
       orderId: "P-XYZ",
       description: "Camiseta Vermelha P",
       price: 34.9,
       quantity: 1,
     });
 
-    ordersItensRepository.create({
+    ordersItemsRepository.create({
       orderId: "P-XYZ",
       description: "Camiseta Azul M",
       price: 34.9,
@@ -68,34 +82,28 @@ describe("List Orders", () => {
   });
 
   it("should be able to list orders filtering by number", async () => {
-    customersRepository.items.push({
-      id: "customer-01",
-      name: "John Doe",
-      document: "01524875149",
-    });
-
     ordersRepository.create({
-      customerId: "customer-01",
+      customerId: customer.id,
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-08"),
       orderNumber: "P-XYZ",
     });
 
     ordersRepository.create({
-      customerId: "customer-01",
+      customerId: customer.id,
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-07"),
       orderNumber: "P-ABC",
     });
 
-    ordersItensRepository.create({
+    ordersItemsRepository.create({
       orderId: "P-ABC",
       description: "Camiseta Vermelha P",
       price: 55.5,
       quantity: 1,
     });
 
-    ordersItensRepository.create({
+    ordersItemsRepository.create({
       orderId: "P-XYZ",
       description: "Camiseta Azul M",
       price: 34.9,
@@ -118,14 +126,8 @@ describe("List Orders", () => {
   it("should be able to list orders filtering by date", async () => {
     vi.setSystemTime(new Date(2025, 12, 3, 16, 46));
 
-    customersRepository.items.push({
-      id: "customer-01",
-      name: "John Doe",
-      document: "01524875149",
-    });
-
     ordersRepository.create({
-      customerId: "customer-01",
+      customerId: customer.id,
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-08"),
       orderNumber: "P-XYZ",
@@ -136,20 +138,20 @@ describe("List Orders", () => {
     vi.advanceTimersByTime(OneDayInMs);
 
     ordersRepository.create({
-      customerId: "customer-01",
+      customerId: customer.id,
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-07"),
       orderNumber: "P-ABC",
     });
 
-    ordersItensRepository.create({
+    ordersItemsRepository.create({
       orderId: "P-ABC",
       description: "Camiseta Vermelha P",
       price: 55.5,
       quantity: 1,
     });
 
-    ordersItensRepository.create({
+    ordersItemsRepository.create({
       orderId: "P-XYZ",
       description: "Camiseta Azul M",
       price: 34.9,
@@ -165,12 +167,6 @@ describe("List Orders", () => {
   });
 
   it("should be able to list orders filtering by status", async () => {
-    customersRepository.items.push({
-      id: "customer-01",
-      name: "John Doe",
-      document: "01524875149",
-    });
-
     ordersRepository.create({
       customerId: "customer-01",
       deliveryAddress: "Cantagalo RJ",
@@ -185,14 +181,14 @@ describe("List Orders", () => {
       orderNumber: "P-ABC",
     });
 
-    ordersItensRepository.create({
+    ordersItemsRepository.create({
       orderId: "P-ABC",
       description: "Camiseta Vermelha P",
       price: 55.5,
       quantity: 1,
     });
 
-    ordersItensRepository.create({
+    ordersItemsRepository.create({
       orderId: "P-XYZ",
       description: "Camiseta Azul M",
       price: 34.9,

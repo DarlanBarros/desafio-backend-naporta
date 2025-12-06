@@ -2,13 +2,22 @@
 
 import { randomUUID } from "node:crypto";
 import type { Order, Prisma } from "@prisma/client";
-import type { ListOrdersRequest } from "@/use-cases/list-orders.js";
-import type { OrdersRepository } from "../orders-repository.js";
+import type { OrdersFilter, OrdersRepository } from "../orders-repository.js";
 
 export class InMemoryOrdersRepository implements OrdersRepository {
   items: Order[] = [];
 
-  async findManyByFilter(filter: ListOrdersRequest): Promise<Order[]> {
+  async findOneById(orderId: string): Promise<Order | null> {
+    const order = this.items.find((item) => item.id === orderId);
+
+    if (!order) {
+      return null;
+    }
+
+    return order;
+  }
+
+  async findManyByFilter(filter: OrdersFilter): Promise<Order[]> {
     const orders = this.items.filter(
       (order) =>
         (!filter.orderNumber ||
@@ -35,5 +44,21 @@ export class InMemoryOrdersRepository implements OrdersRepository {
     this.items.push(order);
 
     return order;
+  }
+
+  async update(orderId: string, data: Partial<Order>): Promise<Order> {
+    const order = this.items.find((item) => item.id === orderId);
+
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    Object.assign(order, data);
+
+    return order;
+  }
+
+  async delete(orderId: string): Promise<void> {
+    this.items = this.items.filter((item) => item.id !== orderId);
   }
 }
