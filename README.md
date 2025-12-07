@@ -38,6 +38,9 @@ docker compose up -d
 # Instalar dependências
 npm install
 
+# Copiar arquivo .env.example para o .env
+cp .env.example .env
+
 # Rodar migrations
 npx prisma migrate dev
 
@@ -54,12 +57,15 @@ http://localhost:3333
 ---
 
 ## 🧪 Testes
-Unitários:
+
+```bash
+#Unitários:
 npm run test
 
-E2E:
+#EndToEnd
 npm run test:e2e
 
+```
 ---
 ## ✅ Funcionalidades
 
