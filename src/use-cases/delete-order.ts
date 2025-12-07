@@ -1,4 +1,3 @@
-import type { OrdersItemsRepository } from "@/repositories/orders-items-repository.js";
 import type { OrdersRepository } from "@/repositories/orders-repository.js";
 
 interface DeleteOrderRequest {
@@ -6,10 +5,7 @@ interface DeleteOrderRequest {
 }
 
 export class DeleteOrderUseCase {
-  constructor(
-    private ordersRepository: OrdersRepository,
-    private orderItemsRepository: OrdersItemsRepository
-  ) {}
+  constructor(private ordersRepository: OrdersRepository) {}
 
   async execute({ id }: DeleteOrderRequest): Promise<void> {
     const orderExists = await this.ordersRepository.findOneById(id);
@@ -18,7 +14,6 @@ export class DeleteOrderUseCase {
       throw new Error("Order doesnt exists");
     }
 
-    await this.orderItemsRepository.deleteAll(id);
     await this.ordersRepository.delete(id);
   }
 }

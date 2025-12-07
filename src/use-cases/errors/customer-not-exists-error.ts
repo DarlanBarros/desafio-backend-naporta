@@ -1,5 +1,9 @@
-export class CustomerNotExistsError extends Error {
+import { DomainError } from "./domain-error.js";
+
+export class CustomerNotExistsError extends DomainError {
+  statusCode = 404;
+
   constructor() {
-    super("Cliente não existente.");
+    super("Customer not found.");
   }
 }

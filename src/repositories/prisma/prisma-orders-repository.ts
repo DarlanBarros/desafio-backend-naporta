@@ -21,9 +21,12 @@ export class PrismaOrdersRepository implements OrdersRepository {
   }
 
   async delete(orderId: string): Promise<void> {
-    await prisma.order.delete({
+    await prisma.order.update({
       where: {
         id: orderId,
+      },
+      data: {
+        deletedAt: new Date(),
       },
     });
   }

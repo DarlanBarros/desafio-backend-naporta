@@ -24,7 +24,7 @@ interface OrdersData {
   items: OrderItemResponse[];
 }
 
-interface ListOrdersRequest {
+export interface ListOrdersRequest {
   orderNumber?: string;
   status?: OrderStatus;
   startDate?: Date;
@@ -61,9 +61,7 @@ export class ListOrdersUseCase {
         deliveryAddress: order.deliveryAddress,
         estimatedDeliveryDate: order.estimatedDeliveryDate,
         createdAt: order.createdAt,
-        items: await this.orderItemsRepository.findManyByOrderId(
-          order.orderNumber
-        ),
+        items: await this.orderItemsRepository.findManyByOrderId(order.id),
       });
     }
 

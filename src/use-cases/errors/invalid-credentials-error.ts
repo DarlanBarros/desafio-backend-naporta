@@ -1,5 +1,9 @@
-export class InvalidCredentialError extends Error {
+import { DomainError } from "./domain-error.js";
+
+export class InvalidCredentialError extends DomainError {
+  statusCode = 401;
+
   constructor() {
-    super("Invalid Credentials");
+    super("Invalid credentials.");
   }
 }

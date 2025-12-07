@@ -1,5 +1,9 @@
-export class EmptyOrderItemsError extends Error {
+import { DomainError } from "./domain-error.js";
+
+export class EmptyOrderItemsError extends DomainError {
+  statusCode = 400;
+
   constructor() {
-    super("Você precisa enviar ao menos um item.");
+    super("The order must contain at least one item.");
   }
 }

@@ -7,7 +7,9 @@
     "start:dev": "tsx watch src/server.ts",
     "start": "node build/server.cjs",
     "build": "tsup src --out-dir build",
-    "test": "vitest run --project unit"
+    "test": "vitest run --project unit",
+    "test:e2e": "vitest run --project e2e",
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +19,11 @@
     "@biomejs/biome": "2.3.8",
     "@types/decimal.js": "0.0.32",
     "@types/node": "24.10.1",
+    "@types/supertest": "6.0.3",
+    "@vitest/coverage-v8": "4.0.15",
+    "@vitest/ui": "4.0.15",
     "prisma": "6.10.0",
+    "supertest": "7.1.4",
     "tsup": "8.5.1",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
@@ -33,6 +39,7 @@
     "decimal.js": "10.6.0",
     "dotenv": "17.2.3",
     "fastify": "5.6.2",
+    "vite": "7.2.6",
     "zod": "4.1.13"
   }
 }

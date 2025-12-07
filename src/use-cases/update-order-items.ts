@@ -1,6 +1,6 @@
 import type { OrdersItemsRepository } from "@/repositories/orders-items-repository.js";
 
-interface UpdateOrderItemRequest {
+export interface UpdateOrderItemRequest {
   description?: string;
   price?: number;
   quantity?: number;

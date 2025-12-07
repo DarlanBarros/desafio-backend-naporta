@@ -59,6 +59,7 @@ model Order {
   estimatedDeliveryDate DateTime    @map("data_previsao_entrega")
   status                OrderStatus @default(PENDING)
   createdAt             DateTime    @default(now()) @map("data_criacao")
+  deletedAt             DateTime?   @map("data_remocao")
 
   customer   Customer @relation(fields: [customerId], references: [id])
   customerId String   @map("cliente_id")

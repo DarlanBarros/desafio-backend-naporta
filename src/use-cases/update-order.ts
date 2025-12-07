@@ -2,7 +2,7 @@ import type { Order, OrderStatus } from "@prisma/client";
 import type { OrdersRepository } from "@/repositories/orders-repository.js";
 import { OrderNotFoundError } from "./errors/order-not-found-error.js";
 
-interface UpdateOrderRequest {
+export interface UpdateOrderRequest {
   estimatedDeliveryDate?: Date;
   deliveryAddress?: string;
   status?: OrderStatus;
@@ -21,7 +21,7 @@ export class UpdateOrderUseCase {
   ): Promise<UpdateOrderResponse> {
     const orderExists = await this.ordersRepository.findOneById(orderId);
 
-    if (!orderExists) {
+    if (!orderExists || orderExists.deletedAt) {
       throw new OrderNotFoundError();
     }
 

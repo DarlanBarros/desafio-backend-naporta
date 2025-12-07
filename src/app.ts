@@ -1,7 +1,10 @@
 import fastifyCookie from "@fastify/cookie";
 import fastifyJwt from "@fastify/jwt";
 import fastify from "fastify";
+import { ZodError } from "zod";
 import { env } from "./env/index.js";
+import { orderItemsRoutes } from "./http/controllers/order-items/routes.js";
+import { ordersRoutes } from "./http/controllers/orders/routes.js";
 import { usersRoutes } from "./http/controllers/users/routes.js";
 
 export const app = fastify();
@@ -20,3 +23,21 @@ app.register(fastifyJwt, {
 app.register(fastifyCookie);
 
 app.register(usersRoutes);
+app.register(ordersRoutes);
+app.register(orderItemsRoutes);
+
+app.setErrorHandler((error, _request, reply) => {
+  if (error instanceof ZodError) {
+    return reply
+      .status(400)
+      .send({ message: "Validation error.", issues: error.format() });
+  }
+
+  if (env.NODE_ENV !== "production") {
+    console.error(error);
+  } else {
+    // TODO: Here we should log to a external tool like DataDog/New Relic/Sentry
+  }
+
+  return reply.status(500).send({ message: "Internal server error." });
+});

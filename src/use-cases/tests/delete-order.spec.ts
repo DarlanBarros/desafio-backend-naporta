@@ -29,7 +29,7 @@ describe("Delete Orders", () => {
       ordersRepository,
       ordersItemsRepository
     );
-    sut = new DeleteOrderUseCase(ordersRepository, ordersItemsRepository);
+    sut = new DeleteOrderUseCase(ordersRepository);
 
     user = await usersRepository.create({
       name: "Jhon Doe",
@@ -63,6 +63,5 @@ describe("Delete Orders", () => {
     });
 
     expect(ordersRepository.items).toHaveLength(0);
-    expect(ordersItemsRepository.items).toHaveLength(0);
   });
 });

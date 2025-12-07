@@ -49,7 +49,7 @@ describe("List Orders", () => {
   });
 
   it("should be able to list orders", async () => {
-    ordersRepository.create({
+    const order = await ordersRepository.create({
       customerId: customer.id,
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-08"),
@@ -57,14 +57,14 @@ describe("List Orders", () => {
     });
 
     ordersItemsRepository.create({
-      orderId: "P-XYZ",
+      orderId: order.id,
       description: "Camiseta Vermelha P",
       price: 34.9,
       quantity: 1,
     });
 
     ordersItemsRepository.create({
-      orderId: "P-XYZ",
+      orderId: order.id,
       description: "Camiseta Azul M",
       price: 34.9,
       quantity: 1,
@@ -82,14 +82,14 @@ describe("List Orders", () => {
   });
 
   it("should be able to list orders filtering by number", async () => {
-    ordersRepository.create({
+    const order1 = await ordersRepository.create({
       customerId: customer.id,
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-08"),
       orderNumber: "P-XYZ",
     });
 
-    ordersRepository.create({
+    const order2 = await ordersRepository.create({
       customerId: customer.id,
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-07"),
@@ -97,21 +97,21 @@ describe("List Orders", () => {
     });
 
     ordersItemsRepository.create({
-      orderId: "P-ABC",
+      orderId: order1.id,
       description: "Camiseta Vermelha P",
       price: 55.5,
       quantity: 1,
     });
 
     ordersItemsRepository.create({
-      orderId: "P-XYZ",
+      orderId: order2.id,
       description: "Camiseta Azul M",
       price: 34.9,
       quantity: 1,
     });
 
     const { ordersData } = await sut.execute({
-      orderNumber: "P-ABC",
+      orderNumber: "P-XYZ",
     });
 
     expect(ordersData).toHaveLength(1);
@@ -126,7 +126,7 @@ describe("List Orders", () => {
   it("should be able to list orders filtering by date", async () => {
     vi.setSystemTime(new Date(2025, 12, 3, 16, 46));
 
-    ordersRepository.create({
+    const order = await ordersRepository.create({
       customerId: customer.id,
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-08"),
@@ -137,7 +137,7 @@ describe("List Orders", () => {
 
     vi.advanceTimersByTime(OneDayInMs);
 
-    ordersRepository.create({
+    const order2 = await ordersRepository.create({
       customerId: customer.id,
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-07"),
@@ -145,14 +145,14 @@ describe("List Orders", () => {
     });
 
     ordersItemsRepository.create({
-      orderId: "P-ABC",
+      orderId: order.id,
       description: "Camiseta Vermelha P",
       price: 55.5,
       quantity: 1,
     });
 
     ordersItemsRepository.create({
-      orderId: "P-XYZ",
+      orderId: order2.id,
       description: "Camiseta Azul M",
       price: 34.9,
       quantity: 1,
@@ -167,14 +167,14 @@ describe("List Orders", () => {
   });
 
   it("should be able to list orders filtering by status", async () => {
-    ordersRepository.create({
+    const order = await ordersRepository.create({
       customerId: "customer-01",
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-08"),
       orderNumber: "P-XYZ",
     });
 
-    ordersRepository.create({
+    const order2 = await ordersRepository.create({
       customerId: "customer-01",
       deliveryAddress: "Cantagalo RJ",
       estimatedDeliveryDate: new Date("2025-12-07"),
@@ -182,14 +182,14 @@ describe("List Orders", () => {
     });
 
     ordersItemsRepository.create({
-      orderId: "P-ABC",
+      orderId: order.id,
       description: "Camiseta Vermelha P",
       price: 55.5,
       quantity: 1,
     });
 
     ordersItemsRepository.create({
-      orderId: "P-XYZ",
+      orderId: order2.id,
       description: "Camiseta Azul M",
       price: 34.9,
       quantity: 1,
